@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "OhnishiHairetsu",
-    "version": "1.3",
+    "version": "1.4",
     "permissions": ["input"],
     "input_components": [
       {

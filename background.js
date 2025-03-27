@@ -1,4 +1,5 @@
 let pressedKeys = new Set();
+let processingKeys = new Set(); // すでに変換処理済みのキーを追跡
 
 const keyMapF = {
     "q": "Q",
@@ -113,8 +114,8 @@ const keyMapN = {
     "v": "}"
 };
 
-// 現在使用するキー・マップ
-let currentKeyMap = keyMapF; // 初期状態は keyMapF
+// 現在使用するキー・マップ（初期状態は keyMapF）
+let currentKeyMap = keyMapF;
 
 /**
  * 現在のキー・マップから変換文字をコミットする。
@@ -124,6 +125,7 @@ let currentKeyMap = keyMapF; // 初期状態は keyMapF
  */
 function commitTextIfNeeded(engineID, key) {
     if (currentKeyMap[key]) {
+        console.log(`Committing conversion: ${key} -> ${currentKeyMap[key]}`);
         chrome.input.ime.commitText({
             contextID: engineID,
             text: currentKeyMap[key]
@@ -134,7 +136,7 @@ function commitTextIfNeeded(engineID, key) {
 }
 
 /**
- * 指定のトリガーキーが押されている場合に対応するキー・マップを使い、
+ * 指定のトリガーキーが押されている場合に、対応するキー・マップを使用して
  * 他のキーから変換文字をコミットする。
  * @param {string} engineID - IME のコンテキストID
  * @param {string} triggerKey - トリガーとなるキー（例: "f", "j", "b", "n"）
@@ -144,23 +146,33 @@ function commitTextIfNeeded(engineID, key) {
 function processTrigger(engineID, triggerKey, mapping) {
     if (pressedKeys.has(triggerKey)) {
         currentKeyMap = mapping; // トリガーキーに対応するマップを選択
+        console.log(`Trigger key "${triggerKey}" detected. Using corresponding mapping.`);
+        let conversionHappened = false;
         // トリガーキー以外のキーで変換を試みる
         for (let key of pressedKeys) {
-            if (key !== triggerKey && commitTextIfNeeded(engineID, key)) {
-                return true;
+            if (key !== triggerKey && !processingKeys.has(key)) {
+                if (commitTextIfNeeded(engineID, key)) {
+                    processingKeys.add(key); // 一度変換したキーは処理済みとする
+                    conversionHappened = true;
+                    console.log(`Conversion done for key: "${key}"`);
+                }
             }
         }
+        return conversionHappened;
     }
     return false;
 }
 
 chrome.input.ime.onKeyEvent.addListener((engineID, keyData) => {
-    console.log("キー入力を検出", keyData);
+    console.log("Key event detected:", keyData);
 
     if (keyData.type === "keydown") {
-        pressedKeys.add(keyData.key); // キーが押されたときにセットに追加
+        pressedKeys.add(keyData.key);
+        console.log(`Key down: "${keyData.key}"`);
     } else if (keyData.type === "keyup") {
-        pressedKeys.delete(keyData.key); // キーが離されたときにセットから削除
+        pressedKeys.delete(keyData.key);
+        processingKeys.delete(keyData.key); // キーアップで処理済み状態を解除
+        console.log(`Key up: "${keyData.key}"`);
     }
 
     // 各トリガーキーに対して変換処理を実行する

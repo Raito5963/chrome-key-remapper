@@ -1,4 +1,4 @@
-// background.jsの内容を削除
+/*// background.jsの内容を削除
 
 // その後、ime.jsのみを使用
 const keyMapping = {
@@ -37,4 +37,14 @@ chrome.input.ime.onKeyEvent.addListener((engineID, keyData) => {
   }
 
   return false; // 通常入力
+});*/
+chrome.runtime.onInstalled.addListener(() => {
+  console.log("IME installed");
 });
+
+chrome.input.ime.onKeyEvent.addListener((engineID, keyData) => {
+  if (keyData.type !== "keydown") return false;
+  console.log(keyData.key);
+  return false; // 何もしない
+});
+

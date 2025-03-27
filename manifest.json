@@ -1,18 +1,19 @@
 {
     "manifest_version": 3,
-    "name": "Key-Remapper",
-    "version": "1.0",
-    "permissions": ["activeTab", "scripting"],
+    "name": "カスタムキーボード拡張",
+    "version": "1.1.0",
+    "permissions": ["commands"],
     "background": {
       "service_worker": "background.js"
     },
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],
-        "js": ["content.js"],
-        "run_at": "document_start"
+    "commands": {
+      "custom_action": {
+        "suggested_key": {
+          "default": "Ctrl+Shift+Y",
+          "mac": "Command+Shift+Y"
+        },
+        "description": "カスタムアクションを実行"
       }
-    ],
-    "host_permissions": ["<all_urls>"]
+    }
   }
   

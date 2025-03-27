@@ -43,8 +43,8 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.input.ime.onKeyEvent.addListener((engineID, keyData) => {
+  console.log("Key event: ", keyData);
   if (keyData.type !== "keydown") return false;
-  console.log(keyData.key);
-  return false; // 何もしない
+  return false; // Return false to prevent further handling
 });
 

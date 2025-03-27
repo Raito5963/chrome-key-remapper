@@ -1,4 +1,4 @@
-let pressedKeys = new Set();
+/*let pressedKeys = new Set();
 let processingKeys = new Set(); // すでに変換処理済みのキーを追跡
 
 const keyMapF = {
@@ -122,7 +122,7 @@ let currentKeyMap = keyMapF;
  * @param {string} engineID - IME のコンテキストID
  * @param {string} key - 入力されたキー
  * @returns {boolean} - 対応する文字があれば true、なければ false
- */
+ 
 function commitTextIfNeeded(engineID, key) {
     if (currentKeyMap[key]) {
         console.log(`Committing conversion: ${key} -> ${currentKeyMap[key]}`);
@@ -142,7 +142,7 @@ function commitTextIfNeeded(engineID, key) {
  * @param {string} triggerKey - トリガーとなるキー（例: "f", "j", "b", "n"）
  * @param {object} mapping - 対応するキー・マップ
  * @returns {boolean} - 変換が実行された場合 true、そうでなければ false
- */
+ 
 function processTrigger(engineID, triggerKey, mapping) {
     if (pressedKeys.has(triggerKey)) {
         currentKeyMap = mapping; // トリガーキーに対応するマップを選択
@@ -182,4 +182,8 @@ chrome.input.ime.onKeyEvent.addListener((engineID, keyData) => {
     if (processTrigger(engineID, "n", keyMapN)) return true; // Nキーの処理
 
     return false; // 何も変換しなかった場合は通常の処理を続行
-});
+});*/
+chrome.runtime.onInstalled.addListener(() => {
+    console.log("Extension Installed and Background Service Worker Running.");
+  });
+  

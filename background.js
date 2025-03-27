@@ -178,8 +178,8 @@ chrome.input.ime.onKeyEvent.addListener((engineID, keyData) => {
     // 各トリガーキーに対して変換処理を実行する
     if (processTrigger(engineID, "f", keyMapF)) return true;
     if (processTrigger(engineID, "j", keyMapJ)) return true;
-    if (processTrigger(engineID, "b", keyMapB)) return true;
-    if (processTrigger(engineID, "n", keyMapN)) return true;
+    if (processTrigger(engineID, "b", keyMapB)) return true; // Bキーの処理
+    if (processTrigger(engineID, "n", keyMapN)) return true; // Nキーの処理
 
     return false; // 何も変換しなかった場合は通常の処理を続行
 });

@@ -1,14 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "大西配列 1.8",
-  "version": "1.8",
+  "name": "大西配列 1.9",
+  "version": "1.9",
   "permissions": ["input"],
   "background": {
     "service_worker": "background.js"
   },
   "input_components": [
     {
-      "name": "大西配列 1.8",
+      "name": "大西配列 1.9",
       "type": "ime",
       "id": "custom-ime",
       "description": "Custom key mapping IME",

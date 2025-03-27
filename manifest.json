@@ -1,14 +1,14 @@
 {
     "manifest_version": 3,
-    "name": "OhnishiHairetsu",
-    "version": "1.4",
+    "name": "大西配列",
+    "version": "1.5",
     "permissions": ["input"],
     "input_components": [
       {
-        "name": "Ohnishi配列",
+        "name": "大西配列",
         "type": "ime",
         "id": "ohnishi_ime",
-        "description": "カスタムIMEを使って独自のキー変換を実装",
+        "description": "カスタムIMEを使って大西配列を実装",
         "layouts": ["jp"]
       }
     ],

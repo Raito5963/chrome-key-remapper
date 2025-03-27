@@ -14,10 +14,20 @@ const keyMapping = {
   " ": "Backspace",
 };
 
-// 既に変換済みのキーを保持するセット
+// 既に変換済みのキーを保持するセット（無限ループ防止用）
 const processedKeys = new Set();
 
-// キーイベントを処理する関数
+/**
+ * キーイベントを処理する関数
+ * 
+ * - keydown で、マッピングに該当する場合は commitText を呼び出し、そのキーを processedKeys に追加。
+ * - keyup で、そのキーを processedKeys から削除して、次回の入力を許可する。
+ * - デバッグ用に各処理段階でログ出力を行う。
+ * 
+ * @param {string} engineID - IME のコンテキストID
+ * @param {object} keyData - キーイベントオブジェクト
+ * @returns {boolean} - キーが変換された場合は true、それ以外は false
+ */
 export function handleKeyEvent(engineID, keyData) {
   // IMEのコンテキストIDが有効か確認
   if (!engineID) {
@@ -25,29 +35,41 @@ export function handleKeyEvent(engineID, keyData) {
     return false;
   }
 
-  // 入力されたキーを小文字に変換して、マッピングを確認する
+  // 入力されたキーを小文字に変換
   const key = keyData.key.toLowerCase();
-  console.log(`キー入力を検出: ${key}`);  // ログを追加
 
-  // キーが既に処理されているか確認（無限ループ防止）
-  if (processedKeys.has(key)) {
-    console.log(`キー ${key} は既に処理されています。無限ループ防止のため処理をスキップします。`);
-    return false; // 無限ループ防止
+  // keyup イベントの場合、処理済みセットから削除して通常処理を続行
+  if (keyData.type === "keyup") {
+    if (processedKeys.has(key)) {
+      processedKeys.delete(key);
+      console.log(`キー "${key}" が離され、processedKeys から削除されました。`);
+    }
+    return false;
   }
 
-  // keyData.type が "keydown" で、かつマッピングが存在する場合、変換テキストをコミット
-  if (keyData.type === "keydown" && keyMapping[key]) {
-    console.log(`キー ${key} に対応する変換テキスト: ${keyMapping[key]}`);  // ログを追加
-    chrome.input.ime.commitText({
-      contextID: engineID,
-      text: keyMapping[key],
-    });
+  // keydown イベントの場合
+  if (keyData.type === "keydown") {
+    console.log(`keydown イベント検出: "${key}"`);
 
-    // 変換済みキーをセットに追加して無限ループ防止
-    processedKeys.add(key);
-    return true; // イベントを消費
+    // 既に処理済みのキーなら無視（無限ループ防止）
+    if (processedKeys.has(key)) {
+      console.log(`キー "${key}" は既に処理済みのためスキップします。`);
+      return false;
+    }
+
+    // マッピングが存在する場合、変換テキストをコミット
+    if (keyMapping[key]) {
+      console.log(`キー "${key}" に対応する変換テキスト: "${keyMapping[key]}" をコミットします。`);
+      chrome.input.ime.commitText({
+        contextID: engineID,
+        text: keyMapping[key],
+      });
+      // 変換済みとしてフラグを設定
+      processedKeys.add(key);
+      return true; // イベントを消費
+    }
   }
 
-  // マッピングに該当しない場合は、通常の処理を継続
+  // 該当しない場合は通常処理を継続
   return false;
 }

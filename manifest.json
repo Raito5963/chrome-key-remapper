@@ -5,7 +5,7 @@
     "permissions": ["input"],
     "input_components": [
       {
-        "name": "大西配列",
+        "name": "大西配列1.7",
         "type": "ime",
         "id": "ohnishi_ime",
         "description": "カスタムIMEを使って大西配列を実装",
@@ -16,4 +16,3 @@
       "service_worker": "background.js"
     }
   }
-  

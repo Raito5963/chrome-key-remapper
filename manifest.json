@@ -1,18 +1,18 @@
 {
-    "manifest_version": 3,
-    "name": "大西配列1.7",
-    "version": "1.7",
-    "permissions": ["input"],
-    "input_components": [
-      {
-        "name": "大西配列1.7",
-        "type": "ime",
-        "id": "ohnishi_ime",
-        "description": "カスタムIMEを使って大西配列を実装",
-        "layouts": ["jp"]
-      }
-    ],
-    "background": {
-      "service_worker": "background.js"
+  "manifest_version": 3,
+  "name": "大西配列 1.8",
+  "version": "1.8",
+  "permissions": ["input"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "input_components": [
+    {
+      "name": "大西配列 1.8",
+      "type": "ime",
+      "id": "custom-ime",
+      "description": "Custom key mapping IME",
+      "layouts": ["jp"]
     }
-  }
+  ]
+}

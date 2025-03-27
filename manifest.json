@@ -1,13 +1,13 @@
 {
     "manifest_version": 3,
     "name": "OhnishiHairetsu",
-    "version": "1.2",
+    "version": "1.3",
     "permissions": ["input"],
     "input_components": [
       {
-        "name": "Custom IME",
+        "name": "Ohnishi配列",
         "type": "ime",
-        "id": "custom_ime",
+        "id": "ohnishi_ime",
         "description": "カスタムIMEを使って独自のキー変換を実装",
         "layouts": ["jp"]
       }

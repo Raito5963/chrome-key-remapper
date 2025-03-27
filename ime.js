@@ -1,3 +1,6 @@
+// background.jsの内容を削除
+
+// その後、ime.jsのみを使用
 const keyMapping = {
   "q": "q", "w": "l", "e": "u", "r": "f", "t": "-",
   "y": "k", "u": "w", "i": "r", "o": "y", "p": "p",

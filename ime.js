@@ -14,62 +14,71 @@ const keyMapping = {
   " ": "Backspace",
 };
 
-// 既に変換済みのキーを保持するセット（無限ループ防止用）
+// 既に変換済みのキーを保持するセット
 const processedKeys = new Set();
+
+// commitText 呼び出し後、一定時間イベント処理を無視するフラグ
+let isProcessing = false;
 
 /**
  * キーイベントを処理する関数
- * 
- * - keydown で、マッピングに該当する場合は commitText を呼び出し、そのキーを processedKeys に追加。
- * - keyup で、そのキーを processedKeys から削除して、次回の入力を許可する。
- * - デバッグ用に各処理段階でログ出力を行う。
- * 
+ *
+ * - keydown 時、マッピングに該当する場合は commitText を呼び出し、
+ *   commitText 呼び出し後に isProcessing フラグを立てて一定時間処理を無視する。
+ * - keyup 時、processedKeys からキーを削除して次回の入力を許可する。
+ *
  * @param {string} engineID - IME のコンテキストID
  * @param {object} keyData - キーイベントオブジェクト
- * @returns {boolean} - キーが変換された場合は true、それ以外は false
+ * @returns {boolean} - 変換処理が実行された場合 true、それ以外は false
  */
 export function handleKeyEvent(engineID, keyData) {
-  // IMEのコンテキストIDが有効か確認
   if (!engineID) {
     console.error("Invalid engineID");
     return false;
   }
 
-  // 入力されたキーを小文字に変換
-  const key = keyData.key.toLowerCase();
-
-  // keyup イベントの場合、処理済みセットから削除して通常処理を続行
+  // キーアップの場合は、処理済みフラグとセットからキーを削除して終了
   if (keyData.type === "keyup") {
-    if (processedKeys.has(key)) {
-      processedKeys.delete(key);
-      console.log(`キー "${key}" が離され、processedKeys から削除されました。`);
+    const upKey = keyData.key.toLowerCase();
+    if (processedKeys.has(upKey)) {
+      processedKeys.delete(upKey);
+      console.log(`キー "${upKey}" が離され、processedKeys から削除されました。`);
     }
     return false;
   }
 
   // keydown イベントの場合
   if (keyData.type === "keydown") {
+    const key = keyData.key.toLowerCase();
     console.log(`keydown イベント検出: "${key}"`);
 
-    // 既に処理済みのキーなら無視（無限ループ防止）
-    if (processedKeys.has(key)) {
-      console.log(`キー "${key}" は既に処理済みのためスキップします。`);
+    // 既に処理済みまたは処理中の場合はスキップ
+    if (processedKeys.has(key) || isProcessing) {
+      console.log(`キー "${key}" は既に処理済みまたは処理中のためスキップします。`);
       return false;
     }
 
-    // マッピングが存在する場合、変換テキストをコミット
     if (keyMapping[key]) {
       console.log(`キー "${key}" に対応する変換テキスト: "${keyMapping[key]}" をコミットします。`);
+
+      // 処理中フラグを立てる
+      isProcessing = true;
       chrome.input.ime.commitText({
         contextID: engineID,
         text: keyMapping[key],
       });
-      // 変換済みとしてフラグを設定
+      // commitText 呼び出し後、キーを処理済みとして登録
       processedKeys.add(key);
+
+      // 一定時間後（50ms）に処理中フラグを解除（必要に応じて調整）
+      setTimeout(() => {
+        isProcessing = false;
+        console.log(`isProcessing フラグが解除されました。`);
+      }, 50);
+
       return true; // イベントを消費
     }
   }
 
-  // 該当しない場合は通常処理を継続
   return false;
 }

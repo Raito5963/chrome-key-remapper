@@ -16,69 +16,51 @@ const keyMapping = {
 
 // 既に変換済みのキーを保持するセット
 const processedKeys = new Set();
-
-// commitText 呼び出し後、一定時間イベント処理を無視するフラグ
 let isProcessing = false;
 
-/**
- * キーイベントを処理する関数
- *
- * - keydown 時、マッピングに該当する場合は commitText を呼び出し、
- *   commitText 呼び出し後に isProcessing フラグを立てて一定時間処理を無視する。
- * - keyup 時、processedKeys からキーを削除して次回の入力を許可する。
- *
- * @param {string} engineID - IME のコンテキストID
- * @param {object} keyData - キーイベントオブジェクト
- * @returns {boolean} - 変換処理が実行された場合 true、それ以外は false
- */
+// キーイベントを処理する関数
 export function handleKeyEvent(engineID, keyData) {
+  // IMEのコンテキストIDが有効か確認
   if (!engineID) {
     console.error("Invalid engineID");
     return false;
   }
 
-  // キーアップの場合は、処理済みフラグとセットからキーを削除して終了
-  if (keyData.type === "keyup") {
-    const upKey = keyData.key.toLowerCase();
-    if (processedKeys.has(upKey)) {
-      processedKeys.delete(upKey);
-      console.log(`キー "${upKey}" が離され、processedKeys から削除されました。`);
-    }
-    return false;
+  const key = keyData.key.toLowerCase();
+  console.log(`キー入力を検出: ${key}`);  // ログを追加
+
+  // 入力されたキーが既に処理されているか確認（無限ループ防止）
+  if (processedKeys.has(key)) {
+    console.log(`キー ${key} は既に処理されています。無限ループ防止のため処理をスキップします。`);
+    return false; // 無限ループ防止
   }
 
-  // keydown イベントの場合
-  if (keyData.type === "keydown") {
-    const key = keyData.key.toLowerCase();
-    console.log(`keydown イベント検出: "${key}"`);
-
-    // 既に処理済みまたは処理中の場合はスキップ
-    if (processedKeys.has(key) || isProcessing) {
-      console.log(`キー "${key}" は既に処理済みまたは処理中のためスキップします。`);
-      return false;
+  // `keydown` のみ処理
+  if (keyData.type === "keydown" && keyMapping[key]) {
+    // 処理中フラグを立てる
+    if (isProcessing) {
+      console.log("処理中のキーが重複しました。スキップします。");
+      return false; // 重複を防ぐ
     }
+    
+    isProcessing = true;  // 処理中フラグを設定
+    
+    // 変換テキストをコミット
+    console.log(`キー ${key} に対応する変換テキスト: ${keyMapping[key]}`);  // ログを追加
+    chrome.input.ime.commitText({
+      contextID: engineID,
+      text: keyMapping[key],
+    });
 
-    if (keyMapping[key]) {
-      console.log(`キー "${key}" に対応する変換テキスト: "${keyMapping[key]}" をコミットします。`);
+    // 変換済みキーをセットに追加
+    processedKeys.add(key);
 
-      // 処理中フラグを立てる
-      isProcessing = true;
-      chrome.input.ime.commitText({
-        contextID: engineID,
-        text: keyMapping[key],
-      });
-      // commitText 呼び出し後、キーを処理済みとして登録
-      processedKeys.add(key);
+    // 処理が完了したらフラグをリセット
+    isProcessing = false;
 
-      // 一定時間後（50ms）に処理中フラグを解除（必要に応じて調整）
-      setTimeout(() => {
-        isProcessing = false;
-        console.log(`isProcessing フラグが解除されました。`);
-      }, 50);
-
-      return true; // イベントを消費
-    }
+    return true; // イベントを消費
   }
 
+  // マッピングに該当しない場合は、通常の処理を続行
   return false;
 }

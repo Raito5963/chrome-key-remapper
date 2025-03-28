@@ -2,18 +2,25 @@
   "name": "Qwerty→Dvorak IME",
   "version": "1.0",
   "manifest_version": 3,
-  "description": "Qwerty 配列のキー入力を Dvorak 配列にリマップする IME 拡張機能。",
-  "permissions": ["storage"],
+  "description": "Qwerty 配列のキー入力を Dvorak 配列にリマップする IME 拡張機能です。",
+  "permissions": [
+    "storage",
+    "input",
+    "input.ime"
+  ],
   "background": {
     "service_worker": "background.js"
   },
-  "commands": {
-    "toggle-ime": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+Y"
-      },
-      "description": "Qwerty ↔︎ Dvorak 切り替え"
+  "input_components": [
+    {
+      "name": "Qwerty→Dvorak IME",
+      "type": "ime",
+      "id": "qwerty-dvorak-ime",
+      "description": "Qwerty を Dvorak にリマップします",
+      "language": ["ja"],
+      "layouts": ["jp"],
+      "path": "ime.html"
     }
-  },
+  ],
   "options_page": "options.html"
 }

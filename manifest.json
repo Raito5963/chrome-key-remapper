@@ -1,21 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "大西配列 1.9.3",
-  "version": "1.9.3",
-  "permissions": [
-    "input",
-    "storage"
-  ],
+  "name": "大西 IME",
+  "version": "2.0",
+  "description": "QWERTYから大西配列に変換するIME",
+  "permissions": ["storage"],
   "background": {
     "service_worker": "background.js"
   },
-  "input_components": [
+  "content_scripts": [
     {
-      "name": "大西配列 1.9.3",
-      "type": "ime",
-      "id": "custom-ime",
-      "description": "Custom key mapping IME",
-      "scripts": ["ime.js"]
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
     }
-  ]
+  ],
+  "host_permissions": ["<all_urls>"]
 }

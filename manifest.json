@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "大西 IME",
-  "version": "2.0",
-  "description": "QWERTYから大西配列に変換するIME",
-  "permissions": ["storage"],
+  "name": "Dvorak IME",
+  "version": "1.0",
+  "description": "Dvorak配列で日本語と英語を入力できるIME風拡張機能",
+  "permissions": ["activeTab", "storage"],
   "background": {
     "service_worker": "background.js"
   },
@@ -14,5 +14,16 @@
       "run_at": "document_start"
     }
   ],
-  "host_permissions": ["<all_urls>"]
+  "action": {
+    "default_title": "Dvorak IME",
+    "default_popup": "popup.html"
+  },
+  "commands": {
+    "toggle-ime": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y"
+      },
+      "description": "Dvorak IMEを切り替え"
+    }
+  }
 }

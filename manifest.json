@@ -1,29 +1,19 @@
 {
-  "manifest_version": 3,
-  "name": "Dvorak IME",
+  "name": "Qwerty to Dvorak IME",
   "version": "1.0",
-  "description": "Dvorak配列で日本語と英語を入力できるIME風拡張機能",
-  "permissions": ["activeTab", "storage"],
-  "background": {
-    "service_worker": "background.js"
-  },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "run_at": "document_start"
-    }
+  "manifest_version": 2,
+  "description": "Qwerty配列をDvorak配列にリマップするIME拡張機能",
+  "permissions": [
+    "input.ime"
   ],
-  "action": {
-    "default_title": "Dvorak IME",
-    "default_popup": "popup.html"
+  "background": {
+    "scripts": ["background.js"]
   },
-  "commands": {
-    "toggle-ime": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+Y"
-      },
-      "description": "Dvorak IMEを切り替え"
-    }
-  }
+  "input_components": [{
+    "name": "Qwerty to Dvorak",
+    "type": "ime",
+    "language": ["en"],
+    "layouts": ["qwerty"],
+    "id": "qwerty-dvorak-ime"
+  }]
 }

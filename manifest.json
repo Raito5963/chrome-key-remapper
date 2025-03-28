@@ -1,19 +1,25 @@
 {
-  "name": "Qwerty to Dvorak IME",
+  "manifest_version": 3,
+  "name": "Qwerty to Dvorak Converter",
   "version": "1.0",
-  "manifest_version": 2,
-  "description": "Qwerty配列をDvorak配列にリマップするIME拡張機能",
-  "permissions": [
-    "input.ime"
-  ],
+  "description": "Qwerty配列をDvorak配列にリマップする拡張機能",
+  "permissions": ["activeTab"],
   "background": {
-    "scripts": ["background.js"]
+    "service_worker": "background.js"
   },
-  "input_components": [{
-    "name": "Qwerty to Dvorak",
-    "type": "ime",
-    "language": ["en"],
-    "layouts": ["qwerty"],
-    "id": "qwerty-dvorak-ime"
-  }]
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  }
 }

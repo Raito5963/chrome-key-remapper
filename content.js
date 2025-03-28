@@ -1,56 +1,37 @@
-// QwertyからDvorakへのキー変換マッピング（基本的な例）
+// Qwerty → Dvorak マッピング
 const qwertyToDvorakMap = {
-  'q': '\'',
-  'w': ',',
-  'e': '.',
-  'r': 'p',
-  't': 'y',
-  'y': 'f',
-  'u': 'g',
-  'i': 'c',
-  'o': 'r',
-  'p': 'l',
-  'a': 'a',
-  's': 'o',
-  'd': 'e',
-  'f': 'u',
-  'g': 'i',
-  'h': 'd',
-  'j': 'h',
-  'k': 't',
-  'l': 'n',
-  ';': 's',
-  'z': ';',
-  'x': 'q',
-  'c': 'j',
-  'v': 'k',
-  'b': 'x',
-  'n': 'b',
-  'm': 'm',
-  ',': 'w',
-  '.': 'v',
-  '/': 'z'
+  'q': "'", 'w': ',', 'e': '.', 'r': 'p', 't': 'y',
+  'y': 'f', 'u': 'g', 'i': 'c', 'o': 'r', 'p': 'l',
+  'a': 'a', 's': 'o', 'd': 'e', 'f': 'u', 'g': 'i',
+  'h': 'd', 'j': 'h', 'k': 't', 'l': 'n', ';': 's',
+  'z': ';', 'x': 'q', 'c': 'j', 'v': 'k', 'b': 'x',
+  'n': 'b', 'm': 'm', ',': 'w', '.': 'v', '/': 'z'
 };
 
-// キーイベントをリッスンして変換処理を実装
-chrome.input.ime.onKeyEvent.addListener(function(engineID, keyData) {
-  // keyData.typeは "keydown" や "keyup" が入ります。ここではkeydownのみ処理します。
-  if (keyData.type === "keydown") {
-    // キーが変換マッピングに存在するかチェック
-    const lowerKey = keyData.key.toLowerCase();
-    if (qwertyToDvorakMap.hasOwnProperty(lowerKey)) {
-      const convertedKey = qwertyToDvorakMap[lowerKey];
-      
-      // テキストのコミットで変換後の文字を入力します
-      chrome.input.ime.commitText({
-        contextID: keyData.contextID,
-        text: convertedKey
-      });
+// Qwerty → Dvorakへの変換処理
+function remapKey(event) {
+  if (event.ctrlKey || event.metaKey || event.altKey) return; // 修飾キーが押された場合は無視
 
-      // イベント処理済みとするため true を返す
-      return true;
+  const originalKey = event.key;
+  const lowerKey = originalKey.toLowerCase();
+  if (qwertyToDvorakMap[lowerKey]) {
+    // 元のイベントをキャンセル
+    event.preventDefault();
+
+    const newKey = qwertyToDvorakMap[lowerKey];
+
+    // 変換後のキーを挿入
+    const input = document.activeElement;
+    if (input && (input.tagName === "INPUT" || input.tagName === "TEXTAREA" || input.isContentEditable)) {
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+
+      // 文字を挿入し、カーソル位置を更新
+      input.value = input.value.slice(0, start) + newKey + input.value.slice(end);
+      input.setSelectionRange(start + 1, start + 1);
     }
   }
-  // 他のキーやkeyupイベントはChrome側に任せる（falseを返す）
-  return false;
-});
+}
+
+// イベントを監視
+document.addEventListener('keydown', remapKey, true);
